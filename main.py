@@ -1,3 +1,4 @@
+from time import sleep
 import urllib.parse
 import urllib.request
 import urllib.response
@@ -11,10 +12,11 @@ URL = 'https://api.warframe.market/v1/'
 SEARCH = 'S'
 CALCULATE = 'C'
 REFRESH = 'R'
-EDIT = 'E'
+GET = 'E'
 DELETE = 'D'
 HELP = 'H'
 QUIT = 'Q'
+
 YES = 'Y'
 NO = 'N'
 
@@ -54,20 +56,20 @@ def main():
                              7
     """)
     print('Warframe.Market Grofit Analyzer')
-
     mode = input().upper()
     last_item = None
     while mode != QUIT:
-        if mode == SEARCH:
-            last_item = research_price()
-            save_item(last_item)
+        if mode == HELP:
+            help_menu()
+        elif mode == SEARCH:
+            last_item = search_price()
             print_listing_info(last_item)
         elif mode == CALCULATE:
             last_item = calculate_rate(last_item)
             save_item(last_item)
             print_rate_info(last_item)
-        elif mode == HELP:
-            help_menu()
+        elif mode == REFRESH:
+            recalculate_items()
 
         if mode != QUIT:
             mode = input().upper()
@@ -87,14 +89,25 @@ def load_item(item: str):
 def path_to_saved_item(item_name: str):
     return SAVED_ITEMS_PATH.joinpath(f'{item_name}.json')
 
+def help_menu():
+    print('Usage:')
+    print(f'[{SEARCH}]: Search listings of an item')
+    print(f'[{CALCULATE}]: Calculator for farming platinum')
+    print(f'[{REFRESH}]: Recalculate platinum values of locally saved items')
+    print(f'[{HELP}]: Help menu')
+    print(f'[{QUIT}]: Quit')
 
-def research_price() -> Item:
+def search_price() -> Item:
     """Search for item listings on Warframe.Market"""
-    q_item = input('Query platinum prices for an item: ')
-    q_item = _input_sanitize(q_item)
-    orders = get_listings(q_item)
+    item_name = input('Query platinum prices for an item: ')
+    item_name = _input_sanitize(item_name)
+    return market_retrieve(item_name)
+
+
+def market_retrieve(item_name: str):
+    orders = get_listings(item_name)
     (p_min, p_max, p_median, p_mean) = _get_price_info(orders)
-    return _save_price_info(q_item, orders, p_min, p_max, p_median, p_mean)
+    return _save_price_info(item_name, orders, p_min, p_max, p_median, p_mean)
 
 def print_listing_info(item: Item):
     print(f'=== {len(item.orders)} listing{"s" if len(item.orders) != 1 else ""} for {item.formatted_name()} ===')
@@ -121,6 +134,7 @@ def calculate_rate(item: Item) -> Item:
         item_name = input('Get farming rate: ')
         item = load_item(_input_sanitize(item_name))
         return _calculate_plat_rate(item)
+
 def _calculate_plat_rate(item):
     chance = float(input('Chance to obtain item in a run: '))
     time = float(input('Run time for item in minutes: '))
@@ -128,18 +142,17 @@ def _calculate_plat_rate(item):
     item.add_rate(exp_time * 60)
     return item
 
+def recalculate_items():
+    for file in SAVED_ITEMS_PATH.iterdir():
+        sleep(1)
+        item_name = file.stem
+        market_retrieve(item_name)
 
-def help_menu():
-    print('Usage:')
-    print(f'[{SEARCH}]: Search listings of an item')
-    print(f'[{CALCULATE}]: Calculator for farming platinum')
-    print(f'[{HELP}]: Help menu')
-    print(f'[{QUIT}]: Quit')
 
-def get_listings(item: str):
+def get_listings(item_name: str):
     """Gets all the listings for given item"""
-    item = _input_sanitize(item)
-    listings_url = URL + f'items/{item}/orders'
+    item_name = _input_sanitize(item_name)
+    listings_url = URL + f'items/{item_name}/orders'
     with urllib.request.urlopen(listings_url) as res:
         orders = json.loads(res.read())['payload']
         return orders
@@ -155,7 +168,9 @@ def _get_price_info(orders: dict):
 
 def _save_price_info(name, orders, i_min, i_max, i_median, i_mean):
     """Constructs a new Item and saves it to the database"""
-    return Item(name, orders, i_min, i_max, i_median, i_mean)
+    item = Item(name, orders, i_min, i_max, i_median, i_mean)
+    save_item(item)
+    return item
 
 def _input_sanitize(q_item: str):
     """Sanitizes input of an item name for use with API"""
