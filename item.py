@@ -12,5 +12,5 @@ class Item:
         split_name = self.name.split('_')
         return ' '.join([word[0].upper() + word[1:] for word in split_name])
 
-    def add_rate(self, rate: int):
+    def add_rate(self, rate: float):
         self.rate = rate

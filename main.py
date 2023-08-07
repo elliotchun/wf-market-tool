@@ -2,9 +2,11 @@ import urllib.parse
 import urllib.request
 import urllib.response
 import json
+from pathlib import Path
 from statistics import mean
 from item import Item
 
+SAVED_ITEMS_PATH = Path('./saved-items/')
 URL = 'https://api.warframe.market/v1/'
 SEARCH = 'S'
 CALCULATE = 'C'
@@ -12,9 +14,10 @@ REFRESH = 'R'
 EDIT = 'E'
 DELETE = 'D'
 HELP = 'H'
-QUIT = 'X'
+QUIT = 'Q'
 YES = 'Y'
 NO = 'N'
+
 
 def main():
     print(r"""
@@ -51,34 +54,57 @@ def main():
                              7
     """)
     print('Warframe.Market Grofit Analyzer')
+
     mode = input().upper()
     last_item = None
     while mode != QUIT:
         if mode == SEARCH:
             last_item = research_price()
+            save_item(last_item)
             print_listing_info(last_item)
         elif mode == CALCULATE:
-            calculate_rate(last_item)
+            last_item = calculate_rate(last_item)
+            save_item(last_item)
+            print_rate_info(last_item)
         elif mode == HELP:
             help_menu()
 
         if mode != QUIT:
             mode = input().upper()
 
+def save_item(item: Item):
+    """Saves item locally"""
+    path_to_item = path_to_saved_item(item.name)
+    with open(path_to_item, 'w') as file:
+        json.dump(item.__dict__, file)
+
+def load_item(item: str):
+    path_to_item = path_to_saved_item(item)
+    with open(path_to_item, 'r') as file:
+        data = json.loads(file)
+    return Item(*data)
+
+def path_to_saved_item(item_name: str):
+    return SAVED_ITEMS_PATH.joinpath(f'{item_name}.json')
+
 
 def research_price() -> Item:
     """Search for item listings on Warframe.Market"""
     q_item = input('Query platinum prices for an item: ')
+    q_item = _input_sanitize(q_item)
     orders = get_listings(q_item)
     (p_min, p_max, p_median, p_mean) = _get_price_info(orders)
     return _save_price_info(q_item, orders, p_min, p_max, p_median, p_mean)
-
 
 def print_listing_info(item: Item):
     print(f'=== {len(item.orders)} listing{"s" if len(item.orders) != 1 else ""} for {item.formatted_name()} ===')
     print(f'Min: {item.min}\t(Max: {item.max})\nMedian: {item.median}\t(Mean: {item.mean})')
 
-def calculate_rate(item: Item) -> float:
+def print_rate_info(item: Item):
+    print(f'=== Platinum Rate for {item.formatted_name()} ===')
+    print(f'Min: {item.min / item.rate}\nMedian: {item.median / item.rate}\t(Mean: {item.mean / item.rate})')
+
+def calculate_rate(item: Item) -> Item:
     """Calculator tool to calculate the rate of farming platinum. Returns plat/hr"""
     use_local_item = False
     if item:
@@ -86,17 +112,22 @@ def calculate_rate(item: Item) -> float:
         response = input('Calculate farming rate for this item?\n').upper()
         while True:
             if response == YES:
-                chance = float(input('Chance to obtain item in a run: '))
-                time = float(input('Run time for item in minutes: '))
-                exp_time = time / chance
-                return item.min / exp_time * 60
+                return _calculate_plat_rate(item)
             elif response == NO:
                 use_local_item = True
                 break
             response = input()
     if not item or use_local_item:
-        item = input('Item: ')
-        raise NotImplementedError
+        item_name = input('Get farming rate: ')
+        item = load_item(_input_sanitize(item_name))
+        return _calculate_plat_rate(item)
+def _calculate_plat_rate(item):
+    chance = float(input('Chance to obtain item in a run: '))
+    time = float(input('Run time for item in minutes: '))
+    exp_time = time / chance
+    item.add_rate(exp_time * 60)
+    return item
+
 
 def help_menu():
     print('Usage:')
