@@ -20,3 +20,8 @@ class Item:
 
     def online_listings(self):
         return [order for order in self.orders['orders'] if order['user']['status'] != 'offline' and order['order_type'] == 'sell']
+
+    def bid(self) -> int:
+        buy_orders = sorted([listing['platinum'] for listing in self.orders['orders'] if
+                         listing['user']['status'] != 'offline' and listing['order_type'] == 'buy'])
+        return buy_orders[-1]

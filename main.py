@@ -13,7 +13,7 @@ URL = 'https://api.warframe.market/v1/'
 SEARCH = 'S'
 CALCULATE = 'C'
 REFRESH = 'R'
-RETRIEVE = 'E'
+RECALL = 'E'
 ALL = 'A'
 DELETE = 'D'
 HELP = 'H'
@@ -77,8 +77,10 @@ def main():
             print('Refreshing...')
             recalculate_items()
             print('All listings have been refreshed!')
-        elif mode == RETRIEVE:
-            retrieve_saved()
+        elif mode == RECALL:
+            recall_saved()
+        elif mode == ALL:
+            print_all_items()
         if mode != QUIT:
             mode = input().upper()
 
@@ -102,13 +104,30 @@ def help_menu():
     print(f'[{SEARCH}]: Search listings of an item')
     print(f'[{CALCULATE}]: Calculator for farming platinum')
     print(f'[{REFRESH}]: Recalculate platinum values of locally saved items')
+    print(f'[{RECALL}]: Recalls the information for a locally saved item')
+    print(f'[{ALL}]: Prints the bid and ask price of each saved item')
     print(f'[{HELP}]: Help menu')
     print(f'[{QUIT}]: Quit')
 
-def retrieve_saved():
+def recall_saved():
+    """Recalls infromation of a saved item"""
     item_name = input('Retrieve the information for a saved item: ')
     item = load_item(_input_sanitize(item_name))
     print_listing_info(item)
+
+def print_all_items():
+    """Prints all saved items"""
+    PRINT_WIDTH = 67
+    print('='*PRINT_WIDTH)
+    print(f'| {"Item Name": ^30} | {"Ask": ^5} | {"Bid": ^5} | {"Spread": ^14} |')
+    print('=' * PRINT_WIDTH)
+    for file in SAVED_ITEMS_PATH.iterdir():
+        item = load_item(file.stem)
+        spread = item.min - item.bid()
+        spread_percent = spread / item.min * 100
+        spread_info = f'{spread} ({spread_percent:<0.2f}%)'
+        print(f'| {item.name: >30} | {item.min: ^5} | {item.bid(): ^5} | {spread_info: ^14} |')
+    print('='*PRINT_WIDTH)
 
 def search_price() -> Item:
     """Search for item listings on Warframe.Market"""
@@ -117,6 +136,7 @@ def search_price() -> Item:
 
 
 def market_retrieve(item_name: str):
+    """Get item information using the given item name"""
     orders = get_listings(item_name)
     item = Item(name=item_name, orders=orders)
     save_item(item)
