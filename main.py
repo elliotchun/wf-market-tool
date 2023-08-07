@@ -57,7 +57,7 @@ def main():
                             LB;
                              7
     """)
-    print('Warframe.Market Grofit Watchlist')
+    print('Warframe.Market Grofit Watchlist Tool')
     mode = input().upper()
     last_item = None
     while mode != QUIT:
@@ -76,7 +76,7 @@ def main():
         elif mode == REFRESH:
             print('Refreshing...')
             recalculate_items()
-            print('All listings have been refreshed!')
+            print('All saved listings have been refreshed!')
         elif mode == RECALL:
             recall_saved()
         elif mode == ALL:
@@ -123,10 +123,8 @@ def print_all_items():
     print('=' * PRINT_WIDTH)
     for file in SAVED_ITEMS_PATH.iterdir():
         item = load_item(file.stem)
-        spread = item.min - item.bid()
-        spread_percent = spread / item.min * 100
-        spread_info = f'{spread} ({spread_percent:<0.2f}%)'
-        print(f'| {item.name: >30} | {item.min: ^5} | {item.bid(): ^5} | {spread_info: ^14} |')
+        spread_info = f'{item.spread} ({item.spread_percent():<0.2f}%)'
+        print(f'| {item.formatted_name(): >30} | {item.min: ^5} | {item.bid(): ^5} | {spread_info: ^14} |')
     print('='*PRINT_WIDTH)
 
 def search_price() -> Item:
@@ -144,7 +142,7 @@ def market_retrieve(item_name: str):
 
 def print_listing_info(item: Item):
     print(f'=== {len(item.online_listings())} listing{"s" if len(item.online_listings()) != 1 else ""} for {item.formatted_name()} ===')
-    print(f'Min: {item.min}\t(Max: {item.max})\nMedian: {item.median}\t(Mean: {item.mean})')
+    print(f'Min/Ask: {item.min}\t(Max: {item.max})\nMedian: {item.median}\t(Mean: {item.mean})\nBid: {item.bid()}\tSpread: {item.spread} ({item.spread_percent()}%)')
 
 def print_rate_info(item: Item):
     print(f'=== Platinum Rate for {item.formatted_name()} ===')
@@ -186,7 +184,7 @@ def get_listings(item_name: str):
     item_name = _input_sanitize(item_name)
     listings_url = URL + f'items/{item_name}/orders'
     with urllib.request.urlopen(listings_url) as res:
-        orders = json.loads(res.read())['payload']
+        orders = json.loads(res.read())['payload']['orders']
         return orders
 
 def _input_sanitize(q_item: str):
