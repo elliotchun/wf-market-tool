@@ -1,12 +1,15 @@
+from statistics import mean
+
 class Item:
-    def __init__(self, name, orders, min, max, median, mean):
+    def __init__(self, *, name, orders, rate = None, **kwargs):
         self.name = name
         self.orders = orders
-        self.min = min
-        self.max = max
-        self.median = median
-        self.mean = mean
-        self.rate = None
+        self.rate = rate
+        prices = sorted([listing['platinum'] for listing in orders['orders'] if listing['user']['status'] != 'offline' and listing['order_type'] == 'sell'])
+        self.min = prices[0]
+        self.max = prices[-1]
+        self.median = prices[int(len(prices) / 2)]
+        self.mean = mean(prices)
 
     def formatted_name(self):
         split_name = self.name.split('_')
@@ -14,3 +17,6 @@ class Item:
 
     def add_rate(self, rate: float):
         self.rate = rate
+
+    def online_listings(self):
+        return [order for order in self.orders['orders'] if order['user']['status'] != 'offline' and order['order_type'] == 'sell']

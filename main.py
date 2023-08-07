@@ -4,7 +4,8 @@ import urllib.request
 import urllib.response
 import json
 from pathlib import Path
-from statistics import mean
+from urllib.error import HTTPError
+
 from item import Item
 
 SAVED_ITEMS_PATH = Path('./saved-items/')
@@ -12,7 +13,8 @@ URL = 'https://api.warframe.market/v1/'
 SEARCH = 'S'
 CALCULATE = 'C'
 REFRESH = 'R'
-GET = 'E'
+RETRIEVE = 'E'
+ALL = 'A'
 DELETE = 'D'
 HELP = 'H'
 QUIT = 'Q'
@@ -55,22 +57,28 @@ def main():
                             LB;
                              7
     """)
-    print('Warframe.Market Grofit Analyzer')
+    print('Warframe.Market Grofit Watchlist')
     mode = input().upper()
     last_item = None
     while mode != QUIT:
         if mode == HELP:
             help_menu()
         elif mode == SEARCH:
-            last_item = search_price()
-            print_listing_info(last_item)
+            try:
+                last_item = search_price()
+                print_listing_info(last_item)
+            except HTTPError as e:
+                print('API Error:', e.status)
         elif mode == CALCULATE:
             last_item = calculate_rate(last_item)
             save_item(last_item)
             print_rate_info(last_item)
         elif mode == REFRESH:
+            print('Refreshing...')
             recalculate_items()
-
+            print('All listings have been refreshed!')
+        elif mode == RETRIEVE:
+            retrieve_saved()
         if mode != QUIT:
             mode = input().upper()
 
@@ -80,11 +88,11 @@ def save_item(item: Item):
     with open(path_to_item, 'w') as file:
         json.dump(item.__dict__, file)
 
-def load_item(item: str):
-    path_to_item = path_to_saved_item(item)
+def load_item(item_name: str) -> Item:
+    path_to_item = path_to_saved_item(item_name)
     with open(path_to_item, 'r') as file:
-        data = json.loads(file)
-    return Item(*data)
+        data = json.load(file)
+    return Item(**data)
 
 def path_to_saved_item(item_name: str):
     return SAVED_ITEMS_PATH.joinpath(f'{item_name}.json')
@@ -97,20 +105,25 @@ def help_menu():
     print(f'[{HELP}]: Help menu')
     print(f'[{QUIT}]: Quit')
 
+def retrieve_saved():
+    item_name = input('Retrieve the information for a saved item: ')
+    item = load_item(_input_sanitize(item_name))
+    print_listing_info(item)
+
 def search_price() -> Item:
     """Search for item listings on Warframe.Market"""
     item_name = input('Query platinum prices for an item: ')
-    item_name = _input_sanitize(item_name)
-    return market_retrieve(item_name)
+    return market_retrieve(_input_sanitize(item_name))
 
 
 def market_retrieve(item_name: str):
     orders = get_listings(item_name)
-    (p_min, p_max, p_median, p_mean) = _get_price_info(orders)
-    return _save_price_info(item_name, orders, p_min, p_max, p_median, p_mean)
+    item = Item(name=item_name, orders=orders)
+    save_item(item)
+    return item
 
 def print_listing_info(item: Item):
-    print(f'=== {len(item.orders)} listing{"s" if len(item.orders) != 1 else ""} for {item.formatted_name()} ===')
+    print(f'=== {len(item.online_listings())} listing{"s" if len(item.online_listings()) != 1 else ""} for {item.formatted_name()} ===')
     print(f'Min: {item.min}\t(Max: {item.max})\nMedian: {item.median}\t(Mean: {item.mean})')
 
 def print_rate_info(item: Item):
@@ -148,7 +161,6 @@ def recalculate_items():
         item_name = file.stem
         market_retrieve(item_name)
 
-
 def get_listings(item_name: str):
     """Gets all the listings for given item"""
     item_name = _input_sanitize(item_name)
@@ -156,21 +168,6 @@ def get_listings(item_name: str):
     with urllib.request.urlopen(listings_url) as res:
         orders = json.loads(res.read())['payload']
         return orders
-
-def _get_price_info(orders: dict):
-    """Gets the plat price information from a list of sell orders."""
-    prices = sorted([listing['platinum'] for listing in orders['orders']])
-    p_min = prices[0]
-    p_max = prices[-1]
-    p_median = prices[int(len(prices) / 2)]
-    p_mean = mean(prices)
-    return p_min, p_max, p_median, p_mean
-
-def _save_price_info(name, orders, i_min, i_max, i_median, i_mean):
-    """Constructs a new Item and saves it to the database"""
-    item = Item(name, orders, i_min, i_max, i_median, i_mean)
-    save_item(item)
-    return item
 
 def _input_sanitize(q_item: str):
     """Sanitizes input of an item name for use with API"""
