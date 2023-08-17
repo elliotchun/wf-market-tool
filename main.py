@@ -136,6 +136,11 @@ def search_price() -> Item:
 def market_retrieve(item_name: str):
     """Get item information using the given item name"""
     orders = get_listings(item_name)
+    item = _get_item_info(item_name)
+    if _item_is_mod(item):
+        print(item_name, 'is a mod.')
+        rank = _ask_for_rank(item)
+        orders = [order for order in orders if order['mod_rank'] == rank]
     item = Item(name=item_name, orders=orders)
     save_item(item)
     return item
@@ -166,7 +171,7 @@ def calculate_rate(item: Item) -> Item:
         item = load_item(_input_sanitize(item_name))
         return _calculate_plat_rate(item)
 
-def _calculate_plat_rate(item):
+def _calculate_plat_rate(item: Item) -> Item:
     chance = float(input('Chance to obtain item in a run: '))
     time = float(input('Run time for item in minutes: '))
     exp_time = time / chance
@@ -187,7 +192,31 @@ def get_listings(item_name: str):
         orders = json.loads(res.read())['payload']['orders']
         return orders
 
-def _input_sanitize(q_item: str):
+def _get_item_info(item_name: str):
+    """Looks up an item via Warframe.Market API"""
+    item_name = _input_sanitize(item_name)
+    item_url = URL + f'items/{item_name}'
+    with urllib.request.urlopen(item_url) as res:
+        items = json.loads(res.read())['payload']['item']['items_in_set']
+    for item in items:
+        if item['url_name'] == item_name:
+            return item
+
+def _ask_for_rank(item) -> int:
+    while True:
+        rank_choice = input('Rank zero or max rank? ')
+        if rank_choice == YES:
+            return 0
+        if rank_choice == NO:
+            return _mod_max_rank(item)
+        print('Not a valid response. [Y] for zero or [N] for max.')
+def _item_is_mod(item) -> bool:
+    return 'mod_max_rank' in item
+
+def _mod_max_rank(item) -> int:
+    return item['mod_max_rank']
+
+def _input_sanitize(q_item: str) -> str:
     """Sanitizes input of an item name for use with API"""
     return '_'.join(q_item.split()).lower()
 
