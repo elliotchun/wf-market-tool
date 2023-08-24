@@ -1,11 +1,10 @@
-from time import sleep
 import urllib.parse
 import urllib.request
 import urllib.response
+from urllib.error import HTTPError
 import json
 from pathlib import Path
-from urllib.error import HTTPError
-
+from time import sleep
 from item import Item
 
 SAVED_ITEMS_PATH = Path('./saved-items/')
@@ -79,6 +78,8 @@ def main():
             print('All saved listings have been refreshed!')
         elif mode == RECALL:
             recall_saved()
+        elif mode == DELETE:
+            delete_item()
         elif mode == ALL:
             print_all_items()
         if mode != QUIT:
@@ -133,7 +134,7 @@ def search_price() -> Item:
     return market_retrieve(_input_sanitize(item_name))
 
 
-def market_retrieve(item_name: str):
+def market_retrieve(item_name: str) -> Item:
     """Get item information using the given item name"""
     orders = get_listings(item_name)
     item = _get_item_info(item_name)
@@ -170,6 +171,15 @@ def calculate_rate(item: Item) -> Item:
         item_name = input('Get farming rate: ')
         item = load_item(_input_sanitize(item_name))
         return _calculate_plat_rate(item)
+
+def delete_item():
+    """Prompts user to delete a locally saved item"""
+    item_name = input('Saved item you want to delete: ')
+    confirmation = ''
+    while confirmation != NO:
+        confirmation = input(f'Please confirm you want to delete this item: {_input_sanitize(item_name)}')
+        if confirmation == YES:
+            path_to_saved_item(_input_sanitize(item_name)).unlink()
 
 def _calculate_plat_rate(item: Item) -> Item:
     chance = float(input('Chance to obtain item in a run: '))
