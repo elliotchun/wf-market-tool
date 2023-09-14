@@ -106,6 +106,7 @@ def help_menu():
     print(f'[{CALCULATE}]: Calculator for farming platinum')
     print(f'[{REFRESH}]: Recalculate platinum values of locally saved items')
     print(f'[{RECALL}]: Recalls the information for a locally saved item')
+    print(f'[{DELETE}]: Deletes a locally saved item')
     print(f'[{ALL}]: Prints the bid and ask price of each saved item')
     print(f'[{HELP}]: Help menu')
     print(f'[{QUIT}]: Quit')
@@ -118,15 +119,15 @@ def recall_saved():
 
 def print_all_items():
     """Prints all saved items"""
-    PRINT_WIDTH = 67
-    print('='*PRINT_WIDTH)
-    print(f'| {"Item Name": ^30} | {"Ask": ^5} | {"Bid": ^5} | {"Spread": ^14} |')
+    PRINT_WIDTH = 65
+    print('_' * PRINT_WIDTH)
+    print(f'{"Item Name": ^30}   {"Ask": ^5}   {"Bid": ^5}   {"Spread": ^14}')
     print('=' * PRINT_WIDTH)
     for file in SAVED_ITEMS_PATH.iterdir():
         item = load_item(file.stem)
         spread_info = f'{item.spread} ({item.spread_percent():<0.2f}%)'
-        print(f'| {item.formatted_name(): >30} | {item.min: ^5} | {item.bid(): ^5} | {spread_info: ^14} |')
-    print('='*PRINT_WIDTH)
+        print(f'{item.formatted_name(): ^30}   {item.min: ^5}   {item.bid(): ^5}   {spread_info: ^14}')
+    print('_' * PRINT_WIDTH)
 
 def search_price() -> Item:
     """Search for item listings on Warframe.Market"""
@@ -176,10 +177,13 @@ def delete_item():
     """Prompts user to delete a locally saved item"""
     item_name = input('Saved item you want to delete: ')
     confirmation = ''
-    while confirmation != NO:
-        confirmation = input(f'Please confirm you want to delete this item: {_input_sanitize(item_name)}')
+    while confirmation != YES or confirmation != NO:
+        confirmation = input(f'Please confirm you want to delete this item: {_input_sanitize(item_name)} (Y/N)')
         if confirmation == YES:
             path_to_saved_item(_input_sanitize(item_name)).unlink()
+            print('Saved listing has been deleted.')
+        else:
+            print('Deletion canceled. Returning to main menu.')
 
 def _calculate_plat_rate(item: Item) -> Item:
     chance = float(input('Chance to obtain item in a run: '))
@@ -214,12 +218,13 @@ def _get_item_info(item_name: str):
 
 def _ask_for_rank(item) -> int:
     while True:
-        rank_choice = input('Rank zero or max rank? ')
+        rank_choice = input('Rank zero or max rank? (Y/N; Zero/Max)')
         if rank_choice == YES:
             return 0
         if rank_choice == NO:
             return _mod_max_rank(item)
         print('Not a valid response. [Y] for zero or [N] for max.')
+
 def _item_is_mod(item) -> bool:
     return 'mod_max_rank' in item
 
