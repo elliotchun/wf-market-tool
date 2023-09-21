@@ -15,6 +15,7 @@ class Item:
         self.spread = self.min - self.bid()
 
     def formatted_name(self):
+        """Returns the name of the item in Title Case"""
         split_name = self.name.split('_')
         return ' '.join([word[0].upper() + word[1:] for word in split_name])
 

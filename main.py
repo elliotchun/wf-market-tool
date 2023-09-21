@@ -20,6 +20,7 @@ QUIT = 'Q'
 
 YES = 'Y'
 NO = 'N'
+ARROW_RIGHT = '->'
 
 
 def main():
@@ -177,8 +178,8 @@ def delete_item():
     """Prompts user to delete a locally saved item"""
     item_name = input('Saved item you want to delete: ')
     confirmation = ''
-    while confirmation != YES or confirmation != NO:
-        confirmation = input(f'Please confirm you want to delete this item: {_input_sanitize(item_name)} (Y/N)')
+    while confirmation != YES and confirmation != NO:
+        confirmation = input(f'Please confirm you want to delete this item: {_input_sanitize(item_name)} (Y/N) ')
         if confirmation == YES:
             path_to_saved_item(_input_sanitize(item_name)).unlink()
             print('Saved listing has been deleted.')
@@ -193,10 +194,30 @@ def _calculate_plat_rate(item: Item) -> Item:
     return item
 
 def recalculate_items():
+    refreshed_items = list()
     for file in SAVED_ITEMS_PATH.iterdir():
         sleep(1)
         item_name = file.stem
-        market_retrieve(item_name)
+        orig_item = load_item(item_name)
+        new_item = market_retrieve(item_name)
+        refreshed_items.append((orig_item, new_item))
+    PRINT_WIDTH = 95
+    print('_' * PRINT_WIDTH)
+    print(f'{"Item Name": ^30}{"Ask": ^25}{"Bid": ^25}{"Spread": ^20}')
+    print('=' * PRINT_WIDTH)
+    for item_pair in refreshed_items:
+        min_diff_percent = (item_pair[1].min - item_pair[0].min) / item_pair[0].min
+        if item_pair[0].bid() != 0:
+            bid_diff_percent = (item_pair[1].bid() - item_pair[0].bid()) / item_pair[0].bid()
+        else:
+            bid_diff_percent = 0
+        min_info = f'{item_pair[0].min: ^5}{ARROW_RIGHT}{item_pair[1].min: ^5}({min_diff_percent:<0.2f}%)'
+        bid_info = f'{item_pair[0].bid(): ^5}{ARROW_RIGHT}{item_pair[1].bid(): ^5}({bid_diff_percent:<0.2f}%)'
+        old_spread_info, new_spread_info = f'{item_pair[0].spread}', f'{item_pair[1].spread}'
+        spread_info = f'{old_spread_info: ^5}{ARROW_RIGHT}{new_spread_info: ^5}'
+        print(
+            f'{item_pair[0].formatted_name(): ^30}   {min_info}   {bid_info}   {spread_info}')
+    print('_' * PRINT_WIDTH)
 
 def get_listings(item_name: str):
     """Gets all the listings for given item"""
@@ -218,7 +239,7 @@ def _get_item_info(item_name: str):
 
 def _ask_for_rank(item) -> int:
     while True:
-        rank_choice = input('Rank zero or max rank? (Y/N; Zero/Max)')
+        rank_choice = input('Rank zero or max rank? (Y/N; Zero/Max) ')
         if rank_choice == YES:
             return 0
         if rank_choice == NO:
