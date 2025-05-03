@@ -1,7 +1,9 @@
 import os
+import sys
 from pathlib import Path
 
 # File paths
+LOG_FILE = sys.stdout
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 SAVED_ITEMS_PATH = BASE_DIR / "data" / "saved_items"
 # Ensure the saved items directory exists

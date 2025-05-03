@@ -24,9 +24,9 @@ def get_all_saved_items():
     return SAVED_ITEMS_PATH.iterdir()
 
 def save_item_list(item_list: list[str]) -> None:
-    with open(SAVED_ITEMS_PATH + ITEM_LIST_NAME, 'w') as file:
+    with open(SAVED_ITEMS_PATH / ITEM_LIST_NAME, 'w') as file:
         file.writelines(item_list)
 
 def load_item_list() -> list[str]:
-    with open(SAVED_ITEMS_PATH + ITEM_LIST_NAME, 'r') as file:
+    with open(SAVED_ITEMS_PATH / ITEM_LIST_NAME, 'r') as file:
         return [line.rstrip('\n') for line in file]
