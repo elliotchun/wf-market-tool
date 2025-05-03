@@ -2,6 +2,7 @@ import time
 
 import requests
 
+from config import REQUEST_HEADERS
 from src.item import Item
 
 URL = "https://api.warframe.market/v2/"
@@ -28,7 +29,7 @@ def _get_json_or_none_if_not_ok(url: str):
     seconds_since_last_api_access = time_now - last_api_access
     if seconds_since_last_api_access < API_RATE_LIMIT_IN_SECONDS:
         time.sleep(API_RATE_LIMIT_IN_SECONDS - seconds_since_last_api_access)
-    res = requests.get(url)
+    res = requests.get(url, headers=REQUEST_HEADERS)
     if res.status_code != requests.codes.ok:
         return None
     return res.json()

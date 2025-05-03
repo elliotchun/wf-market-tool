@@ -5,9 +5,15 @@ from pathlib import Path
 # File paths
 LOG_FILE = sys.stdout
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
-SAVED_ITEMS_PATH = BASE_DIR / "data" / "saved_items"
+DATA_DIR = BASE_DIR / "data"
+SAVED_ITEMS_PATH = DATA_DIR / "saved_items"
 # Ensure the saved items directory exists
 SAVED_ITEMS_PATH.mkdir(exist_ok=True)
+
+REQUEST_HEADERS = {
+    'Platform': 'pc',
+    'Crossplay': 'true'
+}
 
 # Constants
 QUIT = "Q"
