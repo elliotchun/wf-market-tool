@@ -1,10 +1,12 @@
 from statistics import mean
+from time import gmtime
+
 
 class Item:
-    def __init__(self, *, name, orders, **kwargs):
+    def __init__(self, *, name: str, orders, timestamp=gmtime(), **kwargs):
         self.name = name
         self.orders = orders
-
+        self.timestamp = timestamp
         prices = sorted([listing['platinum'] for listing in self.online_sell_orders()])
         if len(prices) == 0:
             prices = [1]
