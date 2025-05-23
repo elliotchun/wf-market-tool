@@ -3,8 +3,8 @@ import urllib.parse
 
 import requests
 
-from config import REQUEST_HEADERS
-from src.item import Item
+from scraper.config import REQUEST_HEADERS
+from item import Item
 
 URL = "https://api.warframe.market/v1/"
 RIVEN_WEAPONS_ENDPOINT = "riven/items"

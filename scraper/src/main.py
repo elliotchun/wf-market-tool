@@ -1,6 +1,6 @@
-import config
-from src import item_listings
-from src.make_requests import save_listings
+from scraper import config
+import item_listings
+from make_requests import save_listings
 
 
 def main():

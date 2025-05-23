@@ -1,11 +1,8 @@
-from time import sleep
+from item import Item
+from item_listings import get_listings
+from item_manager import load_item, path_to_saved_item
+from scraper.config import *
 
-import requests
-
-from config import *
-from src.api import get_listings
-from src.item import Item
-from src.item_manager import save_item, load_item, path_to_saved_item
 
 PRINT_WIDTH = 95
 HEADER_REPEAT_THRESH = 10

@@ -2,8 +2,8 @@ import json
 import pathlib
 import time
 
-from config import SAVED_ITEMS_PATH, DATA_DIR
-from src.item import Item
+from scraper.config import SAVED_ITEMS_PATH, DATA_DIR
+from item import Item
 
 ITEM_LIST_NAME = 'items.list'
 
