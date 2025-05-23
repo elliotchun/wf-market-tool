@@ -28,7 +28,7 @@ def get_listings(item_name: str) -> ListingSnapshot | None:
     response = _get_json_or_none_if_not_ok(listings_url)
     backoff = 0
     while not response and backoff < RETRIES:
-        time.sleep(API_RATE_LIMIT_IN_SECONDS * (backoff + 1))
+        time.sleep(API_RATE_LIMIT_IN_SECONDS * (backoff**2 + 1))
         response = _get_json_or_none_if_not_ok(listings_url)
         backoff += 1
     if not response:
