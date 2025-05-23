@@ -1,6 +1,6 @@
-from item import Item
+from parse_listings import ListingSnapshot
 from item_listings import get_listings
-from item_manager import load_item, path_to_saved_item
+from saved_listing_manager import load_item, path_to_saved_item
 from scraper.config import *
 
 
@@ -134,9 +134,9 @@ def print_item_info_header():
     print('=' * PRINT_WIDTH)
 
 
-def print_listing_info(item: Item):
-    print(f'=== {len(item.online_buy_orders())} listing{"s" if len(item.online_buy_orders()) != 1 else ""} for {item.formatted_name()} ===')
-    print(f'Min/Ask: {item.min}\t(Max: {item.max})\nMedian: {item.median}\t(Mean: {item.mean})\nBid: {item.bid()}\tSpread: {item.spread} ({item.spread_percent()}%)')
+def print_listing_info(listing: ListingSnapshot):
+    print(f'=== {len(listing.online_buy_orders())} listing{"s" if len(listing.online_buy_orders()) != 1 else ""} for {listing.formatted_name()} ===')
+    print(f'Min/Ask: {listing.min}\t(Max: {listing.max})\nMedian: {listing.median}\t(Mean: {listing.mean})\nBid: {listing.bid()}\tSpread: {listing.spread} ({listing.spread_percent()}%)')
 
 def _input_sanitize(q_item: str) -> str:
     """Sanitizes input of an item name for use with API"""

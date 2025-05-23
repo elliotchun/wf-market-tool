@@ -1,6 +1,6 @@
-from item_manager import save_item, save_item_list
+from saved_listing_manager import save_item, save_item_list
 
-def save_listings(api_src, *, log_file=None) -> None:
+def save_listings(api_src, save_path, *, log_file=None) -> None:
     """Get all item listings currently on WFM"""
     items = api_src.get_items()
     save_item_list(items)
@@ -9,4 +9,4 @@ def save_listings(api_src, *, log_file=None) -> None:
         log_file.write(f'Item name: {item_name}\n')
         item = api_src.get_listings(item_name)
         log_file.write(f'Got {len(item.orders)} listings. Saving.\n')
-        save_item(item)
+        save_item(item, save_path)

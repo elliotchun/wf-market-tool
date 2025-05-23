@@ -1,10 +1,11 @@
+import riven_listings
+from saved_listing_manager import save_item
 from scraper import config
-import item_listings
-from make_requests import save_listings
 
 
 def main():
-    save_listings(item_listings, log_file=config.LOG_FILE)
+    item = riven_listings.get_listings('syam')
+    save_item(item, config.SAVED_RIVENS_PATH)
 
 if __name__ == '__main__':
     main()

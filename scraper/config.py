@@ -4,11 +4,15 @@ from pathlib import Path
 
 # File paths
 LOG_FILE = sys.stdout
-BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path('../..')
 DATA_DIR = BASE_DIR / "data"
 SAVED_ITEMS_PATH = DATA_DIR / "saved_items"
+ITEM_LIST_NAME = 'items.list'
 # Ensure the saved items directory exists
 SAVED_ITEMS_PATH.mkdir(exist_ok=True)
+
+SAVED_RIVENS_PATH = DATA_DIR / "saved_rivens"
+SAVED_RIVENS_PATH.mkdir(exist_ok=True)
 
 REQUEST_HEADERS = {
     'Platform': 'pc',

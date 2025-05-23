@@ -4,7 +4,7 @@ import urllib.parse
 import requests
 
 from scraper.config import REQUEST_HEADERS
-from item import Item
+from parse_listings import ListingSnapshot
 
 URL = "https://api.warframe.market/v1/"
 RIVEN_WEAPONS_ENDPOINT = "riven/items"
@@ -19,12 +19,28 @@ def get_items() -> list[str]:
     items = response['payload']['items']
     return [item_short['url_name'] for item_short in items]
 
-def get_listings(item_name: str) -> Item:
+def get_listings(item_name: str) -> ListingSnapshot:
     """Gets all the Riven auctions for the given weapon"""
     listings_url = URL + RIVEN_AUCTIONS_ENDPOINT + _get_query_string_for_weapon(item_name)
     response = _get_json_or_none_if_not_ok(listings_url)
     all_orders = response['payload']['auctions']
-    return Item(name=item_name, orders=all_orders)
+    return ListingSnapshot(name=item_name, orders=_convert_orders(all_orders))
+
+def _convert_orders(orders: list[dict]) -> list[dict]:
+    def is_direct_sale(order: dict) -> bool:
+        return order['is_direct_sell']
+
+    def convert_order(order: dict) -> dict:
+        return {
+            'type': 'sell',
+            'user': {
+                'status': order['owner']['status']
+            },
+            'item': order['item'],
+            'platinum': order['buyout_price']
+        }
+
+    return [convert_order(order) for order in orders if is_direct_sale(order)]
 
 def _get_query_string_for_weapon(item_name: str) -> str:
     query_params = {
