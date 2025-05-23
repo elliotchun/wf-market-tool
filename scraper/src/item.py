@@ -3,7 +3,7 @@ from time import gmtime
 
 
 class Item:
-    def __init__(self, *, name: str, orders, timestamp=gmtime(), **kwargs):
+    def __init__(self, *, name: str, orders, timestamp=gmtime()):
         self.name = name
         self.orders = orders
         self.timestamp = timestamp

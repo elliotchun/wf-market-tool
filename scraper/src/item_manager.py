@@ -22,7 +22,7 @@ def load_item(item_name: str) -> Item:
     path_to_item = path_to_saved_item(item_name)
     with open(path_to_item, 'r') as file:
         data = json.load(file)
-    return Item(**data)
+    return Item()
 
 def path_to_saved_item(item_name: str):
     return SAVED_ITEMS_PATH.joinpath(f'{item_name}.json')
