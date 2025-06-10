@@ -10,7 +10,7 @@ from scraper.src.parse_listings import ListingSnapshot
 URL = "https://api.warframe.market/v1/"
 RIVEN_WEAPONS_ENDPOINT = "riven/items"
 RIVEN_AUCTIONS_ENDPOINT = "auctions/search?"
-API_RATE_LIMIT_IN_SECONDS = 1
+API_RATE_LIMIT_IN_SECONDS = 2
 RETRIES = 10
 
 last_api_access = time.time()
