@@ -17,16 +17,37 @@
 					<PointerGestureRecognizer PointerEntered="RivenModPointerEnter"
 											  PointerExited="RivenModPointerLeave" />
 				</AbsoluteLayout.GestureRecognizers>
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
 				<Image x:Name="RivenModFrameTop"
-					Source="riven_mod_frame_top.png" />
-				<Image x:Name="RivenModFrameBottom"
-					Source="riven_mod_frame_bottom.png" />
-				<Image x:Name="RivenModFrameSideRight"
-					   Source="riven_mod_frame_side.png"
-					   IsVisible="False" />
+					   Grid.Row="0"
+					   Grid.Column="1"
+					   Source="riven_mod_frame_top.png" />
 				<Image x:Name="RivenModFrameSideLeft"
+					   Grid.Row="1"
+					   Grid.Column="0"
 					   Source="riven_mod_frame_side.png"
 					   IsVisible="False" />
+				<Image x:Name="RivenModFrameSideRight"
+					   Grid.Row="1"
+					   Grid.Column="2"
+					   Source="riven_mod_frame_side.png"
+					   IsVisible="False" />
+				<Image x:Name="RivenModFrameBottom"
+					   Grid.Row="2"
+					   Grid.ColumnSpan="3"
+					   Source="riven_mod_frame_bottom.png"
+					   Margin="0,10,0,0" />
 			</AbsoluteLayout>
 			
 			
