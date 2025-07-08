@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WFMarketReporter.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Label
+                Text="Riven Price Calculator"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+			
+			<AbsoluteLayout HorizontalOptions="Center">
+				<AbsoluteLayout.GestureRecognizers>
+					<PointerGestureRecognizer PointerEntered="RivenModPointerEnter"
+											  PointerExited="RivenModPointerLeave" />
+				</AbsoluteLayout.GestureRecognizers>
+				<Image x:Name="RivenModFrameTop"
+					Source="riven_mod_frame_top.png" />
+				<Image x:Name="RivenModFrameBottom"
+					Source="riven_mod_frame_bottom.png" />
+				<Image x:Name="RivenModFrameSideRight"
+					   Source="riven_mod_frame_side.png"
+					   IsVisible="False" />
+				<Image x:Name="RivenModFrameSideLeft"
+					   Source="riven_mod_frame_side.png"
+					   IsVisible="False" />
+			</AbsoluteLayout>
+			
+			
+		</VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
