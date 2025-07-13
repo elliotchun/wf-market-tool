@@ -2,7 +2,7 @@ import time
 
 import requests
 
-from scraper import config
+import config
 from parse_listings import ListingSnapshot
 
 URL = "https://api.warframe.market/v2/"

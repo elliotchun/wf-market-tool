@@ -1,7 +1,7 @@
 from parse_listings import ListingSnapshot
 from item_listings import get_listings
 from saved_listing_manager import load_item, path_to_saved_item
-from scraper.config import *
+from config import *
 
 
 PRINT_WIDTH = 95

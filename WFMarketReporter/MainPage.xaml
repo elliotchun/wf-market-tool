@@ -4,53 +4,25 @@
              x:Class="WFMarketReporter.MainPage">
 
     <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+        <VerticalStackLayout>
             <Label
                 Text="Riven Price Calculator"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
+			<VerticalStackLayout>
+				
 			
-			<AbsoluteLayout HorizontalOptions="Center">
-				<AbsoluteLayout.GestureRecognizers>
-					<PointerGestureRecognizer PointerEntered="RivenModPointerEnter"
-											  PointerExited="RivenModPointerLeave" />
-				</AbsoluteLayout.GestureRecognizers>
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="Auto" />
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="*" />
-					</Grid.ColumnDefinitions>
-				</Grid>
+			<VerticalStackLayout.GestureRecognizers>
+				<PointerGestureRecognizer PointerEntered="RivenModPointerEnter"
+										  PointerExited="RivenModPointerLeave" />
+				</VerticalStackLayout.GestureRecognizers>
 				<Image x:Name="RivenModFrameTop"
-					   Grid.Row="0"
-					   Grid.Column="1"
+					   Aspect="Center"
 					   Source="riven_mod_frame_top.png" />
-				<Image x:Name="RivenModFrameSideLeft"
-					   Grid.Row="1"
-					   Grid.Column="0"
-					   Source="riven_mod_frame_side.png"
-					   IsVisible="False" />
-				<Image x:Name="RivenModFrameSideRight"
-					   Grid.Row="1"
-					   Grid.Column="2"
-					   Source="riven_mod_frame_side.png"
-					   IsVisible="False" />
 				<Image x:Name="RivenModFrameBottom"
-					   Grid.Row="2"
-					   Grid.ColumnSpan="3"
-					   Source="riven_mod_frame_bottom.png"
-					   Margin="0,10,0,0" />
-			</AbsoluteLayout>
-			
-			
+					   Aspect="Center"
+					   Source="riven_mod_frame_bottom.png"  />
+			</VerticalStackLayout>
 		</VerticalStackLayout>
     </ScrollView>
 

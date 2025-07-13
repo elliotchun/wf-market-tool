@@ -2,6 +2,7 @@
 
 public partial class MainPage : ContentPage
 {
+	const int TRANSLATE_AMOUNT = 100;
 	public MainPage()
 	{
 		InitializeComponent();
@@ -20,14 +21,12 @@ public partial class MainPage : ContentPage
 	private async Task RivenModReveal()
 	{
 		// Animate the bottom frame down by the height of the side frame
-		await RivenModFrameBottom.TranslateTo(0, RivenModFrameSideLeft.Height, 250, Easing.CubicInOut);
-		RivenModFrameSideLeft.IsVisible = RivenModFrameSideRight.IsVisible = true;
+		await RivenModFrameBottom.TranslateTo(0, TRANSLATE_AMOUNT, 250, Easing.CubicInOut);
 
 	}
 
 	private async Task RivenModHide()
 	{
 		await RivenModFrameBottom.TranslateTo(0, 0, 250, Easing.CubicInOut);
-		RivenModFrameSideLeft.IsVisible = RivenModFrameSideRight.IsVisible = false;
 	}
 }

@@ -19,7 +19,7 @@ def load_item(data_dir: pathlib.Path, item_name: str) -> ListingSnapshot:
     path_to_item = path_to_saved_item(data_dir, item_name)
     with open(path_to_item, 'r') as file:
         data = json.load(file)
-    return ListingSnapshot() # TODO
+    return ListingSnapshot(**data) # TODO
 
 def path_to_saved_item(data_dir, item_name: str):
     return data_dir.joinpath(f'{item_name}.json')

@@ -3,8 +3,8 @@ import urllib.parse
 
 import requests
 
-from scraper.config import REQUEST_HEADERS
-from scraper.src.parse_listings import ListingSnapshot
+from config import REQUEST_HEADERS
+from parse_listings import ListingSnapshot
 
 
 URL = "https://api.warframe.market/v1/"

@@ -4,7 +4,7 @@ from pathlib import Path
 
 # File paths
 LOG_FILE = sys.stdout
-BASE_DIR = Path('../..')
+BASE_DIR = Path('..')
 DATA_DIR = BASE_DIR / "data"
 SAVED_ITEMS_PATH = DATA_DIR / "saved_items"
 ITEM_LIST_NAME = 'items.list'
